@@ -16,9 +16,11 @@ from models import (
     ElectionVoter,
     Candidate,
     Ballot,
+    BallotSelection,
     Institution,
     User,
 )
+
 
 from flask_login import login_required, current_user
 from extensions import db
@@ -109,6 +111,93 @@ def dashboard():
         if election.status == "active"
     ]
 
+
+
+    # ---------------------------------------------------------
+    # TOP POSITIONS - ACTUAL VOTE DISTRIBUTION
+    # ---------------------------------------------------------
+
+    position_vote_counts = {}
+
+    if election_ids:
+
+        selections = BallotSelection.query.join(
+            Ballot,
+            BallotSelection.ballot_id == Ballot.id
+        ).filter(
+            Ballot.election_id.in_(election_ids)
+        ).all()
+
+        for selection in selections:
+
+            if selection.position:
+
+                position_name = selection.position.name
+
+                position_vote_counts[position_name] = (
+                    position_vote_counts.get(position_name, 0) + 1
+                )
+
+    total_position_votes = sum(
+        position_vote_counts.values()
+    )
+
+    top_positions = []
+
+    if total_position_votes:
+
+        sorted_positions = sorted(
+            position_vote_counts.items(),
+            key=lambda item: item[1],
+            reverse=True
+        )
+
+        colors = [
+            "#0d6efd",
+            "#20c997",
+            "#f59e0b",
+            "#6f42c1",
+            "#64748b",
+        ]
+
+        for index, (name, votes) in enumerate(
+            sorted_positions[:5]
+        ):
+
+            percentage = round(
+                (votes / total_position_votes) * 100,
+                1
+            )
+
+            top_positions.append({
+                "name": name,
+                "votes": votes,
+                "percentage": percentage,
+                "color": colors[
+                    index % len(colors)
+                ],
+            })
+
+        # Group remaining positions as Others
+        if len(sorted_positions) > 5:
+
+            others_votes = sum(
+                votes
+                for _, votes in sorted_positions[5:]
+            )
+
+            others_percentage = round(
+                (others_votes / total_position_votes) * 100,
+                1
+            )
+
+            top_positions.append({
+                "name": "Others",
+                "votes": others_votes,
+                "percentage": others_percentage,
+                "color": "#94a3b8",
+            })
+
     # ---------------------------------------------------------
     # PER-ELECTION VOTER PARTICIPATION
     # ---------------------------------------------------------
@@ -163,6 +252,7 @@ def dashboard():
         voter_turnout=round(voter_turnout, 1),
         total_candidates=len(candidates),
         total_votes=len(ballots),
+        top_positions=top_positions,
     )
 
 @admin_bp.route("/institution")

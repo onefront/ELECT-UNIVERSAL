@@ -403,6 +403,169 @@
 
             border-radius: 10px;
         }
+
+
+
+         /* =========================================
+   TOP POSITIONS CHART
+========================================= */
+
+.top-positions-panel {
+    margin-top: 16px;
+}
+
+.top-positions-content {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.position-donut {
+    width: 150px;
+    height: 150px;
+    flex: 0 0 150px;
+
+    border-radius: 50%;
+
+    background:
+        {% if top_positions %}
+            conic-gradient(
+                {% set ns = namespace(start=0) %}
+
+                {% for position in top_positions %}
+                    {{ position.color }}
+                    {{ ns.start }}%
+                    {{ ns.start + position.percentage }}%
+
+                    {% set ns.start =
+                        ns.start + position.percentage
+                    %}
+
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+            );
+        {% else %}
+            #e5e7eb;
+        {% endif %}
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.position-donut::after {
+    content: "";
+    width: 82px;
+    height: 82px;
+
+    background: white;
+
+    border-radius: 50%;
+}
+
+.position-legend {
+    flex: 1;
+}
+
+.position-legend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 11px;
+
+    font-size: 12px;
+}
+
+.position-legend-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-width: 0;
+}
+
+.position-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    flex-shrink: 0;
+}
+
+.position-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.position-percentage {
+    font-weight: 700;
+    color: #172033;
+    white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+
+    .top-positions-content {
+        gap: 18px;
+    }
+
+    .position-donut {
+        width: 125px;
+        height: 125px;
+        flex-basis: 125px;
+    }
+
+    .position-donut::after {
+        width: 70px;
+        height: 70px;
+    }
+
+}
+
+/* =========================================
+   DASHBOARD MAIN ROW
+   Keep Elections and Quick Actions balanced
+========================================= */
+
+.dashboard-main-row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.dashboard-main-row > .col-xl-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+}
+
+.dashboard-main-row > .col-xl-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+}
+
+.dashboard-main-row .panel {
+    width: 100%;
+}
+
+
+/* TABLET / MOBILE */
+
+@media (max-width: 1199px) {
+
+    .dashboard-main-row > .col-xl-8,
+    .dashboard-main-row > .col-xl-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+}
+
+
+
 /* =========================================
    RESPONSIVE DESIGN
 ========================================= */
@@ -455,56 +618,6 @@
 }
 
 
-//* =========================================
-   RESPONSIVE DESIGN
-========================================= */
-
-.mobile-menu-btn {
-    display: none;
-
-    border: none;
-    background: #0d6efd;
-    color: white;
-
-    width: 42px;
-    height: 42px;
-
-    border-radius: 10px;
-
-    align-items: center;
-    justify-content: center;
-
-    font-size: 18px;
-
-    cursor: pointer;
-}
-
-
-.sidebar-overlay {
-    display: none;
-
-    position: fixed;
-    inset: 0;
-
-    background: rgba(0, 0, 0, 0.45);
-
-    z-index: 999;
-}
-
-
-/* TABLET */
-
-@media (max-width: 991px) {
-
-    .sidebar {
-        width: 220px;
-    }
-
-    .main {
-        margin-left: 220px;
-    }
-
-}
 
 
 /* MOBILE */
@@ -1066,7 +1179,7 @@
 </div>
         <!-- LOWER SECTION -->
 
-        <div class="row g-4">
+        <div class="row g-4 dashboard-main-row">
 
 
             <!-- ELECTIONS -->
@@ -1208,16 +1321,98 @@
 
                     </div>
 
+                              </div>
+
+
+                <!-- TOP POSITIONS -->
+
+                <div class="panel top-positions-panel">
+
+                    <div class="panel-header">
+
+                        <h5>
+                            <i class="fa-solid fa-chart-pie me-2 text-primary"></i>
+                            Top Positions
+                        </h5>
+
+                        <small class="text-muted">
+                            Vote distribution by position.
+                        </small>
+
+                    </div>
+
+
+                    <div class="panel-body">
+
+                        {% if top_positions %}
+
+                            <div class="top-positions-content">
+
+                                <div
+                                    class="position-donut"
+                                ></div>
+
+
+                                <div class="position-legend">
+
+                                    {% for position in top_positions %}
+
+                                        <div class="position-legend-item">
+
+                                            <div class="position-legend-left">
+
+                                                <span
+                                                    class="position-dot"
+                                                    style="
+                                                        background: {{ position.color }};
+                                                    "
+                                                ></span>
+
+                                                <span class="position-name">
+                                                    {{ position.name }}
+                                                </span>
+
+                                            </div>
+
+                                            <span class="position-percentage">
+                                                {{ position.percentage }}%
+                                            </span>
+
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="text-center text-muted py-3">
+
+                                <i class="fa-solid fa-chart-pie fa-2x mb-2"></i>
+
+                                <div>
+                                    No position votes yet.
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
                 </div>
+
 
             </div>
 
 
             <!-- QUICK ACTIONS -->
 
-            <div class="col-12 col-xl-4">
+<div class="col-12 col-xl-4">
 
-                <div class="panel">
+    <div class="panel">
 
                     <div class="panel-header">
 
@@ -1341,6 +1536,227 @@
             </div>
 
         </div>
+
+<!-- ELECTION PARTICIPATION OVERVIEW -->
+
+<div class="row g-4 mt-1">
+
+    <div class="col-lg-8">
+
+        <div class="panel">
+
+            <div class="panel-header d-flex justify-content-between align-items-center">
+
+                <div>
+                    <h5>
+                        <i class="fa-solid fa-chart-line me-2 text-primary"></i>
+                        Participation
+                    </h5>
+
+                    <small class="text-muted">
+                        Voter participation overview.
+                    </small>
+                </div>
+
+                <a
+                    href="{{ url_for('elections.results_index') }}"
+                    class="btn btn-outline-primary btn-sm"
+                >
+                    <i class="fa-solid fa-chart-column me-1"></i>
+                    Results
+                </a>
+
+            </div>
+
+            <div class="panel-body">
+
+                {% if elections %}
+
+                    {% for election in elections %}
+
+                        {% set participation = election_participation[election.id] %}
+
+                        <div
+                            style="
+                                background: #f8fafc;
+                                border: 1px solid #eef0f3;
+                                border-radius: 14px;
+                                padding: 18px;
+                                margin-bottom: 12px;
+                            "
+                        >
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                                <div>
+                                    <strong>
+                                        {{ election.name }}
+                                    </strong>
+
+                                    <small class="text-muted d-block">
+                                        {{ election.start_date.strftime('%d %b %Y') }}
+                                        –
+                                        {{ election.end_date.strftime('%d %b %Y') }}
+                                    </small>
+                                </div>
+
+                                {% if election.status == "active" %}
+
+                                    <span class="status-badge status-active">
+                                        Active
+                                    </span>
+
+                                {% elif election.status == "closed" %}
+
+                                    <span class="status-badge status-closed">
+                                        Closed
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-draft">
+                                        Draft
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <div class="d-flex justify-content-between">
+
+                                    <small class="text-muted">
+                                        Turnout
+                                    </small>
+
+                                    <strong>
+                                        {{ participation.turnout }}%
+                                    </strong>
+
+                                </div>
+
+                                <div
+                                    style="
+                                        height: 8px;
+                                        background: #e9ecef;
+                                        border-radius: 20px;
+                                        overflow: hidden;
+                                        margin-top: 7px;
+                                    "
+                                >
+
+                                    <div
+                                        style="
+                                            width: {{ participation.turnout }}%;
+                                            height: 100%;
+                                            background: #0d6efd;
+                                            border-radius: 20px;
+                                        "
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row g-2">
+
+                                <div class="col-4">
+
+                                    <div
+                                        style="
+                                            background: white;
+                                            border: 1px solid #eef0f3;
+                                            border-radius: 9px;
+                                            padding: 10px;
+                                        "
+                                    >
+
+                                        <small class="text-muted d-block">
+                                            Eligible
+                                        </small>
+
+                                        <strong>
+                                            {{ participation.eligible }}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="col-4">
+
+                                    <div
+                                        style="
+                                            background: white;
+                                            border: 1px solid #eef0f3;
+                                            border-radius: 9px;
+                                            padding: 10px;
+                                        "
+                                    >
+
+                                        <small class="text-muted d-block">
+                                            Voted
+                                        </small>
+
+                                        <strong style="color:#198754;">
+                                            {{ participation.voted }}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="col-4">
+
+                                    <div
+                                        style="
+                                            background: white;
+                                            border: 1px solid #eef0f3;
+                                            border-radius: 9px;
+                                            padding: 10px;
+                                        "
+                                    >
+
+                                        <small class="text-muted d-block">
+                                            Yet to Vote
+                                        </small>
+
+                                        <strong style="color:#d97706;">
+                                            {{ participation.yet_to_vote }}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="text-center py-4 text-muted">
+
+                        No election participation data available.
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
     </section>
 
