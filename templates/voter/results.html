@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ election.name }} - Election Results</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        .topbar {
+            background: #0d6efd;
+            color: white;
+            padding: 18px 25px;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .back {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            margin-top: 20px;
+            border-radius: 16px;
+            box-shadow: 0 5px 18px rgba(0,0,0,.07);
+        }
+
+        .header h1 {
+            margin-top: 0;
+        }
+
+        .published {
+            display: inline-block;
+            padding: 7px 14px;
+            background: #d1e7dd;
+            color: #0f5132;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin: 25px 0;
+        }
+
+        .stat {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 5px 18px rgba(0,0,0,.07);
+        }
+
+        .label {
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+
+        .number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0d6efd;
+        }
+
+        .position {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 5px 18px rgba(0,0,0,.07);
+        }
+
+        .position-title {
+            background: #0d6efd;
+            color: white;
+            padding: 18px 22px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .candidate {
+            padding: 20px 22px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .candidate:last-child {
+            border-bottom: none;
+        }
+
+        .candidate-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .candidate-photo {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #e5e7eb;
+        }
+
+        .candidate-info {
+            flex: 1;
+        }
+
+        .candidate-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .votes {
+            color: #0d6efd;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .percentage {
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .winner {
+            display: inline-block;
+            margin-top: 7px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            background: #d1e7dd;
+            color: #0f5132;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: #0d6efd;
+        }
+
+        .empty {
+            padding: 30px;
+            text-align: center;
+            color: #666;
+        }
+
+        @media (max-width: 700px) {
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .candidate-row {
+                align-items: flex-start;
+            }
+
+            .candidate-photo {
+                width: 55px;
+                height: 55px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+    ✓ ELECT UNIVERSAL
+</div>
+
+<div class="container">
+
+    <a
+        href="{{ url_for('voter_auth.dashboard') }}"
+        class="back"
+    >
+        ← Back to Dashboard
+    </a>
+
+    <div class="header">
+
+        <h1>
+            {{ election.name }}
+        </h1>
+
+        {% if election.description %}
+            <p>
+                {{ election.description }}
+            </p>
+        {% endif %}
+
+        <span class="published">
+            RESULTS PUBLISHED
+        </span>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <div class="label">
+                Eligible Voters
+            </div>
+
+            <div class="number">
+                {{ total_voters }}
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="label">
+                Votes Cast
+            </div>
+
+            <div class="number">
+                {{ votes_cast }}
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="label">
+                Voter Turnout
+            </div>
+
+            <div class="number">
+                {{ "%.1f"|format(turnout_percentage) }}%
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {% if results_data %}
+
+        {% for result in results_data %}
+
+            <div class="position">
+
+                <div class="position-title">
+                    {{ result.position.name }}
+                </div>
+
+
+                {% if result.candidates %}
+
+                    {% for item in result.candidates %}
+
+                        <div class="candidate">
+
+                            <div class="candidate-row">
+
+                                {% if item.candidate.photo %}
+
+                                    <img
+                                        src="{{ url_for(
+                                            'static',
+                                            filename='uploads/candidates/' ~ item.candidate.photo
+                                        ) }}"
+                                        alt="{{ item.candidate.name }}"
+                                        class="candidate-photo"
+                                    >
+
+                                {% endif %}
+
+
+                                <div class="candidate-info">
+
+                                    <div class="candidate-name">
+                                        {{ item.candidate.name }}
+                                    </div>
+
+                                    <div class="votes">
+                                        {{ item.votes }} vote(s)
+                                    </div>
+
+                                    <div class="percentage">
+                                        {{ "%.1f"|format(item.percentage) }}%
+                                    </div>
+
+
+                                    {% if item.is_winner %}
+
+                                        <span class="winner">
+                                            🏆 WINNER
+                                        </span>
+
+                                    {% endif %}
+
+
+                                    <div class="bar">
+
+                                        <div
+                                            class="bar-fill"
+                                            style="width: {{ item.percentage }}%;"
+                                        ></div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty">
+                        No candidates were added to this position.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="position">
+
+            <div class="empty">
+                No election results are available.
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>

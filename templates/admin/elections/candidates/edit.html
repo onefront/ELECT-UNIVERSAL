@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Candidate - {{ election.name }}</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            background: #f5f7fb;
+        }
+
+        .topbar {
+            background: #0d6efd;
+            color: white;
+            padding: 16px 25px;
+        }
+
+        .form-card {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .current-photo {
+            width: 180px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- TOP BAR -->
+
+<div class="topbar">
+
+    <div class="container-fluid">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <a
+                href="{{ url_for('admin.dashboard') }}"
+                class="text-white text-decoration-none fw-bold"
+            >
+                ✓ ELECT UNIVERSAL
+            </a>
+
+            <a
+                href="{{ url_for('auth.logout') }}"
+                class="btn btn-light btn-sm"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CONTENT -->
+
+<div class="container py-5">
+
+    <div class="form-card">
+
+
+        <!-- BACK -->
+
+        <div class="mb-4">
+
+            <a
+                href="{{ url_for(
+                    'candidates.index',
+                    election_id=election.id
+                ) }}"
+                class="text-decoration-none"
+            >
+                ← Back to Candidates
+            </a>
+
+        </div>
+
+
+        <!-- FORM CARD -->
+
+        <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card-body p-4 p-md-5">
+
+
+                <h2 class="fw-bold mb-1">
+                    Edit Candidate
+                </h2>
+
+                <p class="text-muted mb-4">
+                    {{ election.name }}
+                </p>
+
+
+                <!-- FLASH MESSAGES -->
+
+                {% with messages = get_flashed_messages(
+                    with_categories=true
+                ) %}
+
+                    {% if messages %}
+
+                        {% for category, message in messages %}
+
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                {% endwith %}
+
+
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
+
+
+                    <!-- CANDIDATE NAME -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="name"
+                            class="form-label fw-semibold"
+                        >
+                            Candidate Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            class="form-control form-control-lg"
+                            value="{{ candidate.name }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- POSITION -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="position_id"
+                            class="form-label fw-semibold"
+                        >
+                            Election Position
+                        </label>
+
+                        <select
+                            id="position_id"
+                            name="position_id"
+                            class="form-select form-select-lg"
+                            required
+                        >
+
+                            {% for position in positions %}
+
+                                <option
+                                    value="{{ position.id }}"
+                                    {% if candidate.position_id == position.id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ position.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- CURRENT PHOTO -->
+
+                    {% if candidate.photo %}
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Current Candidate Photo
+                            </label>
+
+                            <div>
+
+                                <img
+                                    src="{{ url_for(
+                                        'static',
+                                        filename='uploads/candidates/' ~ candidate.photo
+                                    ) }}"
+                                    alt="{{ candidate.name }}"
+                                    class="current-photo"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- NEW PHOTO -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="photo"
+                            class="form-label fw-semibold"
+                        >
+                            Replace Candidate Photo
+                        </label>
+
+                        <input
+                            type="file"
+                            id="photo"
+                            name="photo"
+                            class="form-control"
+                            accept="image/*"
+                        >
+
+                        <div class="form-text">
+                            Leave this empty to keep the current photo.
+                        </div>
+
+                    </div>
+
+
+                    <!-- MANIFESTO -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="manifesto"
+                            class="form-label fw-semibold"
+                        >
+                            Manifesto
+                        </label>
+
+                        <textarea
+                            id="manifesto"
+                            name="manifesto"
+                            class="form-control"
+                            rows="7"
+                            placeholder="Enter the candidate's manifesto..."
+                        >{{ candidate.manifesto or '' }}</textarea>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="status"
+                            class="form-label fw-semibold"
+                        >
+                            Candidate Status
+                        </label>
+
+                        <select
+                            id="status"
+                            name="status"
+                            class="form-select"
+                        >
+
+                            <option
+                                value="active"
+                                {% if candidate.status == "active" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Active
+                            </option>
+
+                            <option
+                                value="inactive"
+                                {% if candidate.status == "inactive" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Inactive
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- NOTICE -->
+
+                    <div class="alert alert-info">
+
+                        <strong>Candidate:</strong>
+                        {{ candidate.name }}
+
+                        <br>
+
+                        You can update the name, position, photo,
+                        manifesto, or status.
+
+                    </div>
+
+
+                    <!-- BUTTONS -->
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <a
+                            href="{{ url_for(
+                                'candidates.index',
+                                election_id=election.id
+                            ) }}"
+                            class="btn btn-light"
+                        >
+                            Cancel
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary px-4"
+                        >
+                            Save Changes
+                        </button>
+
+                    </div>
+
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</body>
+
+</html>

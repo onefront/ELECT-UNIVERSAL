@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Administrator Management - ELECT UNIVERSAL</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+<body class="bg-light">
+
+<div class="container py-5">
+
+    <!-- HEADER -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+                <i class="fa-solid fa-user-shield me-2"></i>
+                Administrator Management
+            </h2>
+
+            <p class="text-muted mb-0">
+                Manage administrators for your institution.
+            </p>
+
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a
+                href="{{ url_for('admin.settings') }}"
+                class="btn btn-outline-primary"
+            >
+                ← Settings
+            </a>
+
+            <a
+    href="{{ url_for('admin.add_administrator') }}"
+    class="btn btn-primary"
+>
+                <i class="fa-solid fa-user-plus me-1"></i>
+                Add Administrator
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages(
+        with_categories=true
+    ) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- ADMINISTRATORS -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th class="px-4">
+                                Administrator
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Role
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Created
+                            </th>
+
+                            <th class="text-end px-4">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for administrator in administrators %}
+
+                        <tr>
+
+                            <td class="px-4">
+
+                                <div class="fw-semibold">
+                                    {{ administrator.name }}
+                                </div>
+
+                                {% if administrator.id == current_user.id %}
+
+                                    <small class="text-primary">
+                                        <i class="fa-solid fa-user me-1"></i>
+                                        You
+                                    </small>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ administrator.email }}
+                            </td>
+
+
+                            <td>
+
+                                <span class="badge bg-primary">
+                                    {{ administrator.role|capitalize }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if administrator.status == "active" %}
+
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-secondary">
+                                        {{ administrator.status|capitalize }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {{ administrator.created_at.strftime(
+                                    "%d %b %Y"
+                                ) }}
+
+                            </td>
+
+
+                            <td class="text-end px-4">
+
+                                {% if administrator.id == current_user.id %}
+
+                                    <span class="text-muted small">
+                                        Current account
+                                    </span>
+
+                                {% else %}
+
+                                   <div class="d-flex justify-content-end gap-1">
+
+    <a
+        href="{{ url_for(
+            'admin.edit_administrator',
+            user_id=administrator.id
+        ) }}"
+        class="btn btn-sm btn-outline-primary"
+        title="Edit Administrator"
+    >
+        <i class="fa-solid fa-pen"></i>
+    </a>
+
+
+    <a
+        href="{{ url_for(
+            'admin.change_administrator_password',
+            user_id=administrator.id
+        ) }}"
+        class="btn btn-sm btn-outline-warning"
+        title="Change Password"
+    >
+        <i class="fa-solid fa-key"></i>
+    </a>
+
+
+    {% if administrator.id != current_user.id %}
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'admin.toggle_administrator_status',
+                user_id=administrator.id
+            ) }}"
+            class="d-inline"
+        >
+
+            {% if administrator.status == "active" %}
+
+                <button
+                    type="submit"
+                    class="btn btn-sm btn-outline-danger"
+                    title="Deactivate Administrator"
+                    onclick="return confirm(
+                        'Deactivate this administrator?'
+                    );"
+                >
+                    <i class="fa-solid fa-user-slash"></i>
+                </button>
+
+            {% else %}
+
+                <button
+                    type="submit"
+                    class="btn btn-sm btn-outline-success"
+                    title="Activate Administrator"
+                    onclick="return confirm(
+                        'Activate this administrator?'
+                    );"
+                >
+                    <i class="fa-solid fa-user-check"></i>
+                </button>
+
+            {% endif %}
+
+        </form>
+
+    {% endif %}
+
+</div>
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="text-center py-5 text-muted"
+                            >
+
+                                No administrators found.
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

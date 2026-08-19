@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Election Results - ELECT UNIVERSAL</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        .topbar {
+            background: #0d6efd;
+            color: white;
+            padding: 18px 30px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .election-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 18px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.07);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .election-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .active {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .draft {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .closed {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .button {
+            display: inline-block;
+            background: #0d6efd;
+            color: white;
+            text-decoration: none;
+            padding: 11px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .button:hover {
+            background: #0958c7;
+        }
+
+        .empty {
+            background: white;
+            padding: 45px;
+            border-radius: 15px;
+            text-align: center;
+            color: #666;
+        }
+
+        @media (max-width: 650px) {
+
+            .election-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+    ✓ ELECT UNIVERSAL
+</div>
+
+<div class="container">
+
+    <a
+        href="{{ url_for('admin.dashboard') }}"
+        class="back"
+    >
+        ← Back to Dashboard
+    </a>
+
+    <h1>
+        Election Results
+    </h1>
+
+    <p class="subtitle">
+        Select an election to view its results.
+    </p>
+
+
+    {% if elections %}
+
+        {% for election in elections %}
+
+            <div class="election-card">
+
+                <div>
+
+                    <div class="election-name">
+                        {{ election.name }}
+                    </div>
+
+                    <div class="date">
+
+                        {% if election.start_date %}
+                            Starts:
+                            {{ election.start_date.strftime('%d %b %Y, %H:%M') }}
+                        {% endif %}
+
+                        {% if election.end_date %}
+                            <br>
+                            Ends:
+                            {{ election.end_date.strftime('%d %b %Y, %H:%M') }}
+                        {% endif %}
+
+                    </div>
+
+
+                    {% if election.status == "active" %}
+
+                        <span class="status active">
+                            Active
+                        </span>
+
+                    {% elif election.status == "closed" %}
+
+                        <span class="status closed">
+                            Closed
+                        </span>
+
+                    {% else %}
+
+                        <span class="status draft">
+                            Draft
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <a
+                    href="{{ url_for(
+                        'elections.results',
+                        election_id=election.id
+                    ) }}"
+                    class="button"
+                >
+                    View Results →
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty">
+
+            <h2>
+                No Elections Found
+            </h2>
+
+            <p>
+                There are currently no elections available.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>

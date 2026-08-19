@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ election.name }} - ELECT UNIVERSAL</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            background: #f5f7fb;
+        }
+
+        .topbar {
+            background: #0d6efd;
+            color: white;
+            padding: 16px 25px;
+        }
+
+        .card {
+            border: none;
+        }
+
+        .module-card {
+            transition: 0.2s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .module-icon {
+            width: 50px;
+            height: 50px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #e7f0ff;
+            color: #0d6efd;
+
+            border-radius: 12px;
+
+            font-size: 20px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- TOP BAR -->
+
+<div class="topbar">
+
+    <div class="container-fluid">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <a
+                href="{{ url_for('admin.dashboard') }}"
+                class="text-white text-decoration-none fw-bold"
+            >
+                <i class="fa-solid fa-check-to-slot me-2"></i>
+                ELECT UNIVERSAL
+            </a>
+
+            <a
+                href="{{ url_for('auth.logout') }}"
+                class="btn btn-light btn-sm"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CONTENT -->
+
+<div class="container py-5">
+
+
+    <!-- BACK -->
+
+    <div class="mb-4">
+
+        <a
+            href="{{ url_for('elections.index') }}"
+            class="text-decoration-none"
+        >
+            <i class="fa-solid fa-arrow-left me-1"></i>
+            Back to Elections
+        </a>
+
+    </div>
+
+
+    <!-- ELECTION HEADER -->
+
+    <div class="card shadow-sm rounded-4 mb-4">
+
+        <div class="card-body p-4 p-md-5">
+
+            <div class="d-flex justify-content-between align-items-start">
+
+                <div>
+
+                    <div class="text-muted small mb-2">
+                        ELECTION
+                    </div>
+
+                    <h1 class="fw-bold mb-2">
+                        {{ election.name }}
+                    </h1>
+
+                    {% if election.description %}
+
+                        <p class="text-muted mb-0">
+                            {{ election.description }}
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div>
+
+                    {% if election.status == "active" %}
+
+                        <span class="badge bg-success fs-6 px-3 py-2">
+                            ACTIVE
+                        </span>
+
+                    {% elif election.status == "closed" %}
+
+                        <span class="badge bg-danger fs-6 px-3 py-2">
+                            CLOSED
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary fs-6 px-3 py-2">
+                            DRAFT
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <hr class="my-4">
+
+
+            <div class="row g-4">
+
+                <div class="col-md-4">
+
+                    <div class="text-muted small">
+                        Start Date & Time
+                    </div>
+
+                    <div class="fw-semibold mt-1">
+
+                        {{ election.start_date.strftime(
+                            '%d %B %Y, %H:%M'
+                        ) }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="text-muted small">
+                        End Date & Time
+                    </div>
+
+                    <div class="fw-semibold mt-1">
+
+                        {{ election.end_date.strftime(
+                            '%d %B %Y, %H:%M'
+                        ) }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="text-muted small">
+                        Election Status
+                    </div>
+
+                    <div class="fw-semibold mt-1">
+                        {{ election.status|upper }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ELECTION SETUP -->
+
+    <div class="card shadow-sm rounded-4 mb-4">
+
+        <div class="card-body p-4">
+
+            <h4 class="fw-bold mb-1">
+                Election Setup
+            </h4>
+
+            <p class="text-muted">
+                Complete these steps before launching the election.
+            </p>
+
+
+            <div class="row g-4 mt-1">
+
+
+                <!-- POSITIONS -->
+
+                <div class="col-md-4">
+
+                    <div class="card module-card border shadow-sm h-100">
+
+                        <div class="card-body p-4">
+
+                            <div class="module-icon mb-3">
+
+                                <i class="fa-solid fa-list-check"></i>
+
+                            </div>
+
+                            <h5 class="fw-bold">
+                                Positions
+                            </h5>
+
+                            <p class="text-muted">
+                                Create the positions voters will vote for.
+                            </p>
+
+                            <a
+    href="{{ url_for(
+        'positions.index',
+        election_id=election.id
+    ) }}"
+    class="btn btn-primary"
+>
+    Manage Positions
+</a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CANDIDATES -->
+
+                <div class="col-md-4">
+
+                    <div class="card module-card border shadow-sm h-100">
+
+                        <div class="card-body p-4">
+
+                            <div class="module-icon mb-3">
+
+                                <i class="fa-solid fa-user-tie"></i>
+
+                            </div>
+
+                            <h5 class="fw-bold">
+                                Candidates
+                            </h5>
+
+                            <p class="text-muted">
+                                Register candidates for each position.
+                            </p>
+
+                            <a
+    href="{{ url_for(
+        'candidates.index',
+        election_id=election.id
+    ) }}"
+    class="btn btn-primary"
+>
+    Manage Candidates
+</a>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VOTERS -->
+
+                <div class="col-md-4">
+
+                    <div class="card module-card border shadow-sm h-100">
+
+                        <div class="card-body p-4">
+
+                            <div class="module-icon mb-3">
+
+                                <i class="fa-solid fa-users"></i>
+
+                            </div>
+
+                            <h5 class="fw-bold">
+                                Voters
+                            </h5>
+
+                            <p class="text-muted">
+                                Add or import eligible voters.
+                            </p>
+
+                            <a
+    href="{{ url_for(
+        'elections.voters',
+        election_id=election.id
+    ) }}"
+    class="btn btn-primary"
+>
+    Manage Voters
+</a>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+           <!-- ELECTION STATUS CONTROL -->
+
+    <div class="card shadow-sm rounded-4 mb-4">
+
+        <div class="card-body p-4">
+
+            <h4 class="fw-bold mb-2">
+                Election Control
+            </h4>
+
+            <p class="text-muted">
+                Control the voting status of this election.
+            </p>
+
+
+            {% if election.status == "draft" %}
+
+                <div class="alert alert-warning">
+
+                    <strong>
+                        Election is currently in DRAFT.
+                    </strong>
+
+                    <br>
+
+                    Voting is not yet available to voters.
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'elections.update_status',
+                        election_id=election.id
+                    ) }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="status"
+                        value="active"
+                    >
+
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                        onclick="return confirm(
+                            'Are you sure you want to launch this election? Voting will become available to eligible voters.'
+                        );"
+                    >
+
+                        <i class="fa-solid fa-play me-2"></i>
+
+                        Launch Election
+
+                    </button>
+
+                </form>
+
+
+            {% elif election.status == "active" %}
+
+                <div class="alert alert-success">
+
+                    <strong>
+                        Election is ACTIVE.
+                    </strong>
+
+                    <br>
+
+                    Eligible voters can now vote.
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'elections.update_status',
+                        election_id=election.id
+                    ) }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="status"
+                        value="closed"
+                    >
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger"
+                        onclick="return confirm(
+                            'Are you sure you want to close this election? Voting will no longer be available.'
+                        );"
+                    >
+
+                        <i class="fa-solid fa-stop me-2"></i>
+
+                        Close Election
+
+                    </button>
+
+                </form>
+
+
+            {% elif election.status == "closed" %}
+
+                <div class="alert alert-danger mb-0">
+
+                    <strong>
+                        Election is CLOSED.
+                    </strong>
+
+                    <br>
+
+                    Voting is no longer available.
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+ <!-- RESULTS PUBLICATION -->
+
+<div class="card shadow-sm rounded-4 mb-4">
+
+    <div class="card-body p-4">
+
+        <h4 class="fw-bold mb-2">
+            <i class="fa-solid fa-square-poll-vertical me-2 text-primary"></i>
+            Results Publication
+        </h4>
+
+        <p class="text-muted">
+            Control when the official election results become available to voters.
+        </p>
+
+
+        {% if election.status != "closed" %}
+
+            <div class="alert alert-warning mb-0">
+
+                <strong>
+                    <i class="fa-solid fa-lock me-1"></i>
+                    Results are locked.
+                </strong>
+
+                <br>
+
+                The election must be closed before the official results
+                can be published.
+
+            </div>
+
+
+        {% elif election.settings and election.settings.results_published %}
+
+            <div class="alert alert-success">
+
+                <strong>
+                    <i class="fa-solid fa-circle-check me-1"></i>
+                    Results Published
+                </strong>
+
+                <br>
+
+                The official election results are now available to voters.
+
+            </div>
+
+
+            <a
+                href="{{ url_for(
+                    'elections.results',
+                    election_id=election.id
+                ) }}"
+                class="btn btn-primary"
+            >
+
+                <i class="fa-solid fa-chart-column me-2"></i>
+
+                View Election Results
+
+            </a>
+
+
+        {% else %}
+
+            <div class="alert alert-info">
+
+                <strong>
+                    <i class="fa-solid fa-eye-slash me-1"></i>
+                    Results Not Published
+                </strong>
+
+                <br>
+
+                Voters cannot see the official results yet.
+                Review the results before publishing them.
+
+            </div>
+
+
+            <div class="d-flex gap-2 flex-wrap">
+
+                <a
+                    href="{{ url_for(
+                        'elections.results',
+                        election_id=election.id
+                    ) }}"
+                    class="btn btn-outline-primary"
+                >
+
+                    <i class="fa-solid fa-chart-column me-2"></i>
+
+                    Review Results
+
+                </a>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'elections.publish_results',
+                        election_id=election.id
+                    ) }}"
+                    onsubmit="return confirm(
+                        'Are you sure you want to publish the official results? Once published, voters will be able to see them.'
+                    );"
+                >
+
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                    >
+
+                        <i class="fa-solid fa-bullhorn me-2"></i>
+
+                        Publish Official Results
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+
+
+
+
+{% if election.status != "active" %}
+
+    <hr class="my-4">
+
+    <div class="alert alert-warning">
+
+        <strong>
+            <i class="fa-solid fa-triangle-exclamation me-1"></i>
+            Danger Zone
+        </strong>
+
+        <div class="small mt-1">
+            Deleting this election permanently removes its
+            positions, candidates, voter assignments, ballots,
+            selections and election settings.
+        </div>
+
+    </div>
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'elections.delete',
+            election_id=election.id
+        ) }}"
+        onsubmit="return confirm(
+            'WARNING: This will permanently delete the election and all related voting data. Are you absolutely sure?'
+        );"
+    >
+
+        <button
+            type="submit"
+            class="btn btn-outline-danger"
+        >
+            <i class="fa-solid fa-trash me-2"></i>
+            Delete Election
+        </button>
+
+    </form>
+
+{% endif %}
+
+
+    </div>
+
+
+    <!-- WORKFLOW -->
+
+    <div class="card shadow-sm rounded-4">
+
+        <div class="card-body p-4">
+
+            <h4 class="fw-bold">
+                Election Workflow
+            </h4>
+
+            <div class="mt-4">
+
+
+                <div class="d-flex align-items-center mb-3">
+
+                    <div
+                        class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                        style="width:40px;height:40px;"
+                    >
+                        1
+                    </div>
+
+                    <div class="ms-3">
+
+                        <div class="fw-bold">
+                            Create Positions
+                        </div>
+
+                        <small class="text-muted">
+                            Define the offices being contested.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="d-flex align-items-center mb-3">
+
+                    <div
+                        class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                        style="width:40px;height:40px;"
+                    >
+                        2
+                    </div>
+
+                    <div class="ms-3">
+
+                        <div class="fw-bold">
+                            Register Candidates
+                        </div>
+
+                        <small class="text-muted">
+                            Assign candidates to positions.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="d-flex align-items-center mb-3">
+
+                    <div
+                        class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                        style="width:40px;height:40px;"
+                    >
+                        3
+                    </div>
+
+                    <div class="ms-3">
+
+                        <div class="fw-bold">
+                            Add Voters
+                        </div>
+
+                        <small class="text-muted">
+                            Import or register eligible voters.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="d-flex align-items-center">
+
+                    <div
+                        class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
+                        style="width:40px;height:40px;"
+                    >
+                        4
+                    </div>
+
+                    <div class="ms-3">
+
+                        <div class="fw-bold">
+                            Launch Election
+                        </div>
+
+                        <small class="text-muted">
+                            Activate the election after everything is ready.
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% if election.status == "draft" %}
+
+                <div class="alert alert-warning mt-4 mb-0">
+
+                    <i class="fa-solid fa-circle-info me-2"></i>
+
+                    This election is currently in
+                    <strong>DRAFT</strong> status.
+
+                    Complete the election setup before launching it.
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Institution - ELECT UNIVERSAL
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+<body class="bg-light">
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+                <i class="fa-solid fa-building me-2"></i>
+                Institution
+            </h2>
+
+            <p class="text-muted mb-0">
+                Institution information and branding
+            </p>
+
+        </div>
+
+        <div class="d-flex gap-2">
+
+    <a
+        href="{{ url_for('admin.dashboard') }}"
+        class="btn btn-outline-secondary"
+    >
+        <i class="fa-solid fa-arrow-left me-1"></i>
+        Dashboard
+    </a>
+
+    <a
+        href="{{ url_for('admin.edit_institution') }}"
+        class="btn btn-primary"
+    >
+        <i class="fa-solid fa-pen-to-square me-1"></i>
+        Edit Institution
+    </a>
+
+</div>
+    </div>
+
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4">
+
+            <div class="row g-4">
+
+                <!-- LOGO -->
+
+                <div class="col-md-4 text-center">
+
+                    {% if institution.logo %}
+
+                        <img
+    src="{{ url_for(
+        'uploaded_file',
+        filename=institution.logo
+    ) }}"
+    alt="{{ institution.name }}"
+    class="img-fluid rounded"
+    style="max-height: 180px;"
+>
+
+                    {% else %}
+
+                        <div
+                            class="bg-light border rounded p-5"
+                        >
+
+                            <i
+                                class="fa-solid fa-building fa-4x text-muted"
+                            ></i>
+
+                            <p class="text-muted mt-3 mb-0">
+                                No logo uploaded
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- INFORMATION -->
+
+                <div class="col-md-8">
+
+                    <h3 class="fw-bold">
+                        {{ institution.name }}
+                    </h3>
+
+                    <hr>
+
+                    <div class="row mb-3">
+
+                        <div class="col-sm-4 text-muted">
+                            Institution Code
+                        </div>
+
+                        <div class="col-sm-8 fw-semibold">
+                            {{ institution.code }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="row mb-3">
+
+                        <div class="col-sm-4 text-muted">
+                            Email
+                        </div>
+
+                        <div class="col-sm-8">
+                            {{ institution.email or "Not provided" }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="row mb-3">
+
+                        <div class="col-sm-4 text-muted">
+                            Phone
+                        </div>
+
+                        <div class="col-sm-8">
+                            {{ institution.phone or "Not provided" }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="row mb-3">
+
+                        <div class="col-sm-4 text-muted">
+                            Address
+                        </div>
+
+                        <div class="col-sm-8">
+                            {{ institution.address or "Not provided" }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="row mb-3">
+
+                        <div class="col-sm-4 text-muted">
+                            Status
+                        </div>
+
+                        <div class="col-sm-8">
+
+                            {% if institution.status == "active" %}
+
+                                <span class="badge bg-success">
+                                    Active
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-secondary">
+                                    {{ institution.status|capitalize }}
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

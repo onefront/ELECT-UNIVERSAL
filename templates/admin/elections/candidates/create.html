@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Add Candidate - {{ election.name }}</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            background: #f5f7fb;
+        }
+
+        .topbar {
+            background: #0d6efd;
+            color: white;
+            padding: 16px 25px;
+        }
+
+        .form-card {
+            max-width: 850px;
+            margin: auto;
+        }
+
+        .photo-preview {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            display: none;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- TOP BAR -->
+
+<div class="topbar">
+
+    <div class="container-fluid">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <a
+                href="{{ url_for('admin.dashboard') }}"
+                class="text-white text-decoration-none fw-bold"
+            >
+                ✓ ELECT UNIVERSAL
+            </a>
+
+            <a
+                href="{{ url_for('auth.logout') }}"
+                class="btn btn-light btn-sm"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CONTENT -->
+
+<div class="container py-5">
+
+    <div class="form-card">
+
+
+        <div class="mb-4">
+
+            <a
+                href="{{ url_for(
+                    'candidates.index',
+                    election_id=election.id
+                ) }}"
+                class="text-decoration-none"
+            >
+                ← Back to Candidates
+            </a>
+
+        </div>
+
+
+        <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card-body p-4 p-md-5">
+
+
+                <h2 class="fw-bold mb-1">
+                    Add Candidate
+                </h2>
+
+                <p class="text-muted mb-4">
+                    {{ election.name }}
+                </p>
+
+
+                <!-- FLASH MESSAGES -->
+
+                {% with messages = get_flashed_messages(
+                    with_categories=true
+                ) %}
+
+                    {% if messages %}
+
+                        {% for category, message in messages %}
+
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                {% endwith %}
+
+
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
+
+
+                    <!-- POSITION -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="position_id"
+                            class="form-label fw-semibold"
+                        >
+                            Election Position
+                        </label>
+
+                        <select
+                            id="position_id"
+                            name="position_id"
+                            class="form-select form-select-lg"
+                            required
+                        >
+
+                            <option value="">
+                                Select a position
+                            </option>
+
+                            {% for position in positions %}
+
+                                <option
+                                    value="{{ position.id }}"
+                                >
+                                    {{ position.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div class="form-text">
+                            Select the position this candidate is contesting.
+                        </div>
+
+                    </div>
+
+
+                    <!-- NAME -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="name"
+                            class="form-label fw-semibold"
+                        >
+                            Candidate Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            class="form-control form-control-lg"
+                            placeholder="e.g. John Mensah"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- PHOTO -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="photo"
+                            class="form-label fw-semibold"
+                        >
+                            Candidate Photo
+                        </label>
+
+                        <input
+                            type="file"
+                            id="photo"
+                            name="photo"
+                            class="form-control"
+                            accept="image/*"
+                        >
+
+                        <div class="form-text">
+                            Optional. Recommended: clear passport-style photo.
+                        </div>
+
+
+                        <div class="mt-3">
+
+                            <img
+                                id="photoPreview"
+                                class="photo-preview"
+                                alt="Candidate photo preview"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MANIFESTO -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="manifesto"
+                            class="form-label fw-semibold"
+                        >
+                            Manifesto
+                        </label>
+
+                        <textarea
+                            id="manifesto"
+                            name="manifesto"
+                            class="form-control"
+                            rows="6"
+                            placeholder="Enter the candidate's manifesto..."
+                        ></textarea>
+
+                        <div class="form-text">
+                            Optional. Voters can view this information before voting.
+                        </div>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="status"
+                            class="form-label fw-semibold"
+                        >
+                            Candidate Status
+                        </label>
+
+                        <select
+                            id="status"
+                            name="status"
+                            class="form-select"
+                        >
+
+                            <option value="active">
+                                Active
+                            </option>
+
+                            <option value="inactive">
+                                Inactive
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- INFORMATION -->
+
+                    <div class="alert alert-info">
+
+                        <strong>Important:</strong>
+
+                        Make sure the candidate is registered under the
+                        correct election position before saving.
+
+                    </div>
+
+
+                    <!-- BUTTONS -->
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+
+                        <a
+                            href="{{ url_for(
+                                'candidates.index',
+                                election_id=election.id
+                            ) }}"
+                            class="btn btn-light"
+                        >
+                            Cancel
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary px-4"
+                        >
+                            Add Candidate
+                        </button>
+
+                    </div>
+
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const photoInput = document.getElementById("photo");
+
+    const photoPreview = document.getElementById("photoPreview");
+
+
+    photoInput.addEventListener(
+        "change",
+        function () {
+
+            const file = this.files[0];
+
+            if (!file) {
+
+                photoPreview.style.display = "none";
+
+                photoPreview.src = "";
+
+                return;
+
+            }
+
+
+            const reader = new FileReader();
+
+
+            reader.onload = function (event) {
+
+                photoPreview.src = event.target.result;
+
+                photoPreview.style.display = "block";
+
+            };
+
+
+            reader.readAsDataURL(file);
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>

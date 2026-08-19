@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Results - {{ election.name }}</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .topbar {
+            background: #0d6efd;
+            color: white;
+            padding: 18px 25px;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 80px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 45px;
+            text-align: center;
+            border-radius: 18px;
+            box-shadow: 0 5px 20px rgba(0,0,0,.08);
+        }
+
+        .icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: #0d6efd;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+    ✓ ELECT UNIVERSAL
+</div>
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="icon">
+            🏆
+        </div>
+
+        <h1>
+            {{ election.name }}
+        </h1>
+
+        <h2>
+            Results Not Yet Available
+        </h2>
+
+        <p>
+            {{ message }}
+        </p>
+
+        <a
+            href="{{ url_for('voter_auth.dashboard') }}"
+            class="back"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

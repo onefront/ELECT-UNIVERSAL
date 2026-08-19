@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Compose Bulk SMS - ELECT UNIVERSAL
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+</head>
+
+<body class="bg-light">
+
+
+<div class="bg-primary text-white p-3">
+
+    <div class="container-fluid">
+
+        <strong>
+            ✓ ELECT UNIVERSAL
+        </strong>
+
+    </div>
+
+</div>
+
+
+<div class="container py-5">
+
+    <a
+        href="{{ url_for('sms.index') }}"
+        class="text-decoration-none"
+    >
+        ← Back to SMS
+    </a>
+
+
+    <div class="card shadow-sm border-0 mt-4">
+
+        <div class="card-body p-4">
+
+            <h2 class="fw-bold">
+                Compose Bulk SMS
+            </h2>
+
+            <p class="text-muted">
+                Send a message to your active voters.
+            </p>
+
+
+            <form method="POST">
+
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+                        Recipients
+                    </label>
+
+
+                    <div class="form-check">
+
+                        <input
+                            class="form-check-input"
+                            type="radio"
+                            name="recipient_type"
+                            value="all"
+                            id="all"
+                            checked
+                        >
+
+                        <label
+                            class="form-check-label"
+                            for="all"
+                        >
+                            All Active Voters
+                            ({{ voters|length }})
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check mt-2">
+
+                        <input
+                            class="form-check-input"
+                            type="radio"
+                            name="recipient_type"
+                            value="selected"
+                            id="selected"
+                        >
+
+                        <label
+                            class="form-check-label"
+                            for="selected"
+                        >
+                            Selected Voters
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <div
+    id="voterList"
+    class="border rounded p-3 mb-4"
+    style="max-height:350px; overflow-y:auto;"
+>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <strong>
+                Select Voters
+            </strong>
+
+            <div class="text-muted small">
+                <span id="selectedCount">0</span>
+                selected
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                id="selectAll"
+            >
+                Select All
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                id="clearAll"
+            >
+                Clear
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <input
+        type="text"
+        id="voterSearch"
+        class="form-control mb-3"
+        placeholder="Search by name, Voter ID or phone number..."
+    >
+
+
+    <div id="voterItems">
+
+        {% for voter in voters %}
+
+            {% if voter.phone %}
+
+                <div
+                    class="voter-item border-bottom py-2"
+                    data-search="{{ voter.name|lower }} {{ voter.voter_identifier|lower }} {{ voter.phone|lower }}"
+                >
+
+                    <div class="form-check">
+
+                        <input
+                            class="form-check-input voter-checkbox"
+                            type="checkbox"
+                            name="voter_ids"
+                            value="{{ voter.id }}"
+                            id="voter{{ voter.id }}"
+                        >
+
+                        <label
+                            class="form-check-label w-100"
+                            for="voter{{ voter.id }}"
+                        >
+
+                            <strong>
+                                {{ voter.name }}
+                            </strong>
+
+                            <br>
+
+                            <span class="text-muted small">
+                                {{ voter.voter_identifier }}
+                                —
+                                {{ voter.phone }}
+                            </span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+                <div class="mb-4">
+
+                    <label
+                        for="message"
+                        class="form-label fw-semibold"
+                    >
+                        Message
+                    </label>
+
+                    <textarea
+                        id="message"
+                        name="message"
+                        class="form-control"
+                        rows="6"
+                        maxlength="1000"
+                        placeholder="Type your SMS message..."
+                        required
+                    ></textarea>
+
+                    <div class="form-text">
+
+                        <span id="counter">0</span>
+                        / 1000 characters
+
+                    </div>
+
+                </div>
+
+
+                <div class="alert alert-info">
+
+                    <strong>Note:</strong>
+
+                    The message will be recorded as
+                    <strong>Pending</strong> until an SMS
+                    gateway is connected.
+
+                </div>
+
+
+                <div class="d-flex gap-2">
+
+                    <a
+                        href="{{ url_for('sms.index') }}"
+                        class="btn btn-light"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Prepare Bulk SMS
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const message = document.getElementById("message");
+const counter = document.getElementById("counter");
+
+message.addEventListener("input", function () {
+    counter.textContent = this.value.length;
+});
+
+
+const allRadio = document.getElementById("all");
+const selectedRadio = document.getElementById("selected");
+const voterList = document.getElementById("voterList");
+
+const checkboxes = () =>
+    document.querySelectorAll(".voter-checkbox");
+
+const selectedCount =
+    document.getElementById("selectedCount");
+
+const selectAll =
+    document.getElementById("selectAll");
+
+const clearAll =
+    document.getElementById("clearAll");
+
+const voterSearch =
+    document.getElementById("voterSearch");
+
+
+function updateVoterList() {
+
+    voterList.style.display =
+        selectedRadio.checked
+        ? "block"
+        : "none";
+
+}
+
+
+function updateSelectedCount() {
+
+    const count =
+        document.querySelectorAll(
+            ".voter-checkbox:checked"
+        ).length;
+
+    selectedCount.textContent = count;
+
+}
+
+
+checkboxes().forEach(function (checkbox) {
+
+    checkbox.addEventListener(
+        "change",
+        updateSelectedCount
+    );
+
+});
+
+
+selectAll.addEventListener(
+    "click",
+    function () {
+
+        checkboxes().forEach(function (checkbox) {
+
+            const item =
+                checkbox.closest(".voter-item");
+
+            if (
+                item &&
+                item.style.display !== "none"
+            ) {
+                checkbox.checked = true;
+            }
+
+        });
+
+        updateSelectedCount();
+
+    }
+);
+
+
+clearAll.addEventListener(
+    "click",
+    function () {
+
+        checkboxes().forEach(function (checkbox) {
+            checkbox.checked = false;
+        });
+
+        updateSelectedCount();
+
+    }
+);
+
+
+voterSearch.addEventListener(
+    "input",
+    function () {
+
+        const search =
+            this.value.toLowerCase().trim();
+
+        document
+            .querySelectorAll(".voter-item")
+            .forEach(function (item) {
+
+                const text =
+                    item.dataset.search;
+
+                item.style.display =
+                    text.includes(search)
+                    ? ""
+                    : "none";
+
+            });
+
+    }
+);
+
+
+allRadio.addEventListener(
+    "change",
+    updateVoterList
+);
+
+
+selectedRadio.addEventListener(
+    "change",
+    updateVoterList
+);
+
+
+updateVoterList();
+updateSelectedCount();
+
+</script>
+
+</body>
+
+</html>

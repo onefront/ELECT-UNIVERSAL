@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Bulk SMS - ELECT UNIVERSAL
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+</head>
+
+<body class="bg-light">
+
+<div class="bg-primary text-white p-3">
+
+    <div class="container-fluid d-flex justify-content-between">
+
+        <strong>
+            ✓ ELECT UNIVERSAL
+        </strong>
+
+        <a
+            href="{{ url_for('admin.dashboard') }}"
+            class="btn btn-light btn-sm"
+        >
+            Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+
+<div class="container py-5">
+<a
+    href="{{ url_for('voters.index') }}"
+    class="text-decoration-none mb-3 d-inline-block"
+>
+    ← Back to Voter Management
+</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+                Bulk SMS
+            </h2>
+
+            <p class="text-muted mb-0">
+                Send messages to your voters.
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('sms.compose') }}"
+            class="btn btn-primary"
+        >
+            + Compose SMS
+        </a>
+
+    </div>
+
+
+    {% with messages = get_flashed_messages(
+        with_categories=true
+    ) %}
+
+        {% for category, message in messages %}
+
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endwith %}
+
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">
+                SMS History
+            </h5>
+
+
+            {% if sms_logs %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover">
+
+                        <thead>
+
+                            <tr>
+    <th>Date</th>
+    <th>Recipients</th>
+    <th>Message</th>
+    <th>Status</th>
+    <th class="text-end">Action</th>
+</tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for sms in sms_logs %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ sms.created_at.strftime(
+                                            "%d %b %Y %H:%M"
+                                        ) }}
+                                    </td>
+
+                                    <td>
+                                        {{ sms.recipient_count }}
+                                    </td>
+
+                                    <td>
+                                        {{ sms.message }}
+                                    </td>
+
+                                    <td>
+
+                                        {% if sms.status == "sent" %}
+
+                                            <span class="badge bg-success">
+                                                Sent
+                                            </span>
+
+                                        {% elif sms.status == "failed" %}
+
+                                            <span class="badge bg-danger">
+                                                Failed
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-warning text-dark">
+                                                Pending
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td class="text-end">
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'sms.delete_sms',
+            sms_id=sms.id
+        ) }}"
+        onsubmit="return confirm(
+            'Are you sure you want to delete this SMS history record?'
+        );"
+        class="d-inline"
+    >
+
+        <button
+            type="submit"
+            class="btn btn-sm btn-outline-danger"
+        >
+            🗑 Delete
+        </button>
+
+    </form>
+
+</td>
+
+
+
+
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="text-center text-muted py-5">
+
+                    <h5>
+                        No SMS messages yet
+                    </h5>
+
+                    <p>
+                        Your SMS history will appear here.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
