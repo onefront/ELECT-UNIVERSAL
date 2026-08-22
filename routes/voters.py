@@ -15,8 +15,10 @@ from flask_login import login_required, current_user
 from extensions import db
 from models import (
     Voter,
-    ElectionVoter
+    ElectionVoter,
+    SMSLog
 )
+from services.sms_service import BMSSMSService
 
 
 voters_bp = Blueprint(
@@ -89,6 +91,84 @@ def index():
         "admin/voters/index.html",
         voters=voters
     )
+
+
+@voters_bp.route(
+    "/send-login-details",
+    methods=["POST"]
+)
+@login_required
+def send_login_details():
+    """Send a fresh set of login details to every eligible voter."""
+
+    voters = Voter.query.filter_by(
+        institution_id=current_user.institution_id,
+        status="active"
+    ).filter(
+        Voter.phone.isnot(None)
+    ).all()
+
+    voters = [voter for voter in voters if voter.phone.strip()]
+
+    if not voters:
+        flash(
+            "No active voters with phone numbers were found.",
+            "warning"
+        )
+        return redirect(url_for("voters.index"))
+
+    service = BMSSMSService()
+
+    if not service.enabled or not service.is_configured():
+        flash(
+            "SMS is not enabled or configured. Check your SMS settings.",
+            "danger"
+        )
+        return redirect(url_for("voters.index"))
+
+    sent_count = 0
+    failed_count = 0
+
+    for voter in voters:
+        temporary_password = generate_password()
+        message = (
+            "ELECT UNIVERSAL login details: "
+            f"Voter ID: {voter.voter_identifier}. "
+            f"Temporary password: {temporary_password}. "
+            "Please keep these details private."
+        )
+
+        result = service.send_sms([voter.phone.strip()], message)
+
+        if result["success"]:
+            voter.set_password(temporary_password)
+            sent_count += 1
+        else:
+            failed_count += 1
+
+    sms_log = SMSLog(
+        institution_id=current_user.institution_id,
+        message="Voter login details were sent by SMS.",
+        recipient_count=sent_count,
+        status="sent" if failed_count == 0 else "failed"
+    )
+    db.session.add(sms_log)
+    db.session.commit()
+
+    if sent_count:
+        flash(
+            f"Login details were sent to {sent_count} voter(s).",
+            "success"
+        )
+
+    if failed_count:
+        flash(
+            f"Login details could not be sent to {failed_count} voter(s). "
+            "Their passwords were not changed.",
+            "warning"
+        )
+
+    return redirect(url_for("voters.index"))
 
 
 

@@ -129,6 +129,20 @@
         + Generate Login Credentials
     </a>
 
+    <form
+        method="POST"
+        action="{{ url_for('voters.send_login_details') }}"
+        onsubmit="return confirm('This will generate a new temporary password for every active voter with a phone number and send their login details by SMS. Continue?');"
+        class="d-inline"
+    >
+        <button
+            type="submit"
+            class="btn btn-warning"
+        >
+            Send Login Details by SMS
+        </button>
+    </form>
+
 
     <form
         method="POST"
