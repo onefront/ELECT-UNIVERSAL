@@ -22,6 +22,59 @@
         rel="stylesheet"
     >
 
+    <style>
+        .election-page-header {
+            padding: 24px 28px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #1d4ed8, #2563eb 58%, #38bdf8);
+            box-shadow: 0 12px 26px rgba(37, 99, 235, 0.22);
+            color: white;
+        }
+
+        .election-page-header h1,
+        .election-page-header h2,
+        .election-page-header p {
+            color: white;
+        }
+
+        .election-page-header p {
+            opacity: 0.85;
+        }
+
+        .election-page-header .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .election-page-header .back-link:hover {
+            color: white;
+            opacity: 1;
+        }
+
+        .election-page-header .create-election-button {
+            background: white;
+            border-color: white;
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+
+        .election-page-header .create-election-button:hover {
+            background: #eff6ff;
+            border-color: #eff6ff;
+            color: #1e40af;
+        }
+
+        @media (max-width: 576px) {
+            .election-page-header {
+                padding: 20px;
+            }
+        }
+    </style>
+
 </head>
 
 <body class="bg-light">
@@ -52,18 +105,12 @@
 
 <div class="container py-5">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="election-page-header d-flex justify-content-between align-items-center mb-4">
 
         <div>
          <a
     href="{{ url_for('admin.dashboard') }}"
-    style="
-        display: inline-block;
-        margin-bottom: 15px;
-        color: #0d6efd;
-        text-decoration: none;
-        font-weight: 600;
-    "
+    class="back-link"
 >
     ← Back to Dashboard
 </a>
@@ -81,7 +128,7 @@
 
         <a
             href="{{ url_for('elections.create') }}"
-            class="btn btn-primary"
+            class="btn btn-primary create-election-button"
         >
             <i class="fa-solid fa-plus me-1"></i>
             Create Election
